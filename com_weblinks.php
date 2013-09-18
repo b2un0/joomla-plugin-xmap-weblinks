@@ -110,12 +110,12 @@ final class xmap_com_weblinks {
 			$node->priority = $params['category_priority'];
 			$node->changefreq = $params['category_changefreq'];
 			$node->pid = $row->parent_id;
-			$node->link = WeblinksHelperRoute::getCategoryRoute($row->id . ':' . $row->alias);
+			$node->link = WeblinksHelperRoute::getCategoryRoute($row->id);
 			
 			if ($xmap->printNode($node) !== false) {
 				self::getCategoryTree($xmap, $parent, $params, $row->id);
 				if ($params['include_links']) {
-					self::getlinks($xmap, $parent, $params, $row->id, $row->alias);
+					self::getlinks($xmap, $parent, $params, $row->id);
 				}
 			}
 		}
@@ -128,9 +128,8 @@ final class xmap_com_weblinks {
 		$now = JFactory::getDate()->toSql();
 		
 		$query = $db->getQuery(true)
-				->select(array('w.id', 'w.alias', 'w.title', 'c.alias AS category_alias'))
+				->select(array('w.id', 'w.alias', 'w.title'))
 				->from('#__weblinks AS w')
-				->join('INNER', '#__categories AS c ON w.catid = c.id')
 				->where('w.catid = ' . $db->Quote($catid))
 				->where('w.state = 1')
 				->where('(w.publish_up = ' . $db->quote($db->getNullDate()) . ' OR w.publish_up <= ' . $db->quote($now) . ')')
@@ -162,7 +161,7 @@ final class xmap_com_weblinks {
 			$node->browserNav = $parent->browserNav;
 			$node->priority = $params['link_priority'];
 			$node->changefreq = $params['link_changefreq'];
-			$node->link = WeblinksHelperRoute::getWeblinkRoute($row->id . ':' . $row->category_alias, $catid);
+			$node->link = WeblinksHelperRoute::getWeblinkRoute($row->id . ':' . $row->alias, $catid);
 			
 			$xmap->printNode($node);
 		}
