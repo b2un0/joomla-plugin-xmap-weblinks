@@ -82,7 +82,7 @@
 			</fieldset>
 		</fields>
 	</config>
-	<!-- <updateservers>
+	<updateservers>
 		<server type="extension" priority="1" name="Xmap - Weblinks">http://www.z-index.net/en/joomla-xmap-plugins/xmap-weblinks/updatestream.xml</server>
-	</updateservers> -->
+	</updateservers>
 </extension>
