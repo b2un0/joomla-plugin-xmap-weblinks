@@ -125,7 +125,7 @@ final class xmap_com_weblinks {
 	
 	private static function getlinks(XmapDisplayer &$xmap, stdClass &$parent, array &$params, $catid) {
 		$db = JFactory::getDbo();
-		$now = JFactory::getDate()->toSql();
+		$now = JFactory::getDate('now', 'UTC')->toSql();
 		
 		$query = $db->getQuery(true)
 				->select(array('w.id', 'w.alias', 'w.title'))
