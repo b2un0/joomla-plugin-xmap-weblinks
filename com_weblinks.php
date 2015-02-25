@@ -11,8 +11,8 @@ defined('_JEXEC') or die;
 
 class xmap_com_weblinks
 {
-
     private static $views = array('categories', 'category');
+
     private static $enabled = false;
 
     public function __construct()
