@@ -11,8 +11,14 @@ defined('_JEXEC') or die;
 
 class xmap_com_weblinks
 {
+    /**
+     * @var array
+     */
     private static $views = array('categories', 'category');
 
+    /**
+     * @var bool
+     */
     private static $enabled = false;
 
     public function __construct()
@@ -22,11 +28,19 @@ class xmap_com_weblinks
         JLoader::register('WeblinksHelperRoute', JPATH_SITE . '/components/com_weblinks/helpers/route.php');
     }
 
-    public static function getTree(XmapDisplayer &$xmap, stdClass &$parent, array &$params)
+    /**
+     * @param XmapDisplayerInterface $xmap
+     * @param stdClass $parent
+     * @param array $params
+     *
+     * @throws Exception
+     */
+    public static function getTree($xmap, stdClass $parent, array &$params)
     {
         $uri = new JUri($parent->link);
 
-        if (!self::$enabled || !in_array($uri->getVar('view'), self::$views)) {
+        if (!self::$enabled || !in_array($uri->getVar('view'), self::$views))
+        {
             return;
         }
 
@@ -43,26 +57,31 @@ class xmap_com_weblinks
         $params['category_priority'] = JArrayHelper::getValue($params, 'category_priority', $parent->priority);
         $params['category_changefreq'] = JArrayHelper::getValue($params, 'category_changefreq', $parent->changefreq);
 
-        if ($params['category_priority'] == -1) {
+        if ($params['category_priority'] == -1)
+        {
             $params['category_priority'] = $parent->priority;
         }
 
-        if ($params['category_changefreq'] == -1) {
+        if ($params['category_changefreq'] == -1)
+        {
             $params['category_changefreq'] = $parent->changefreq;
         }
 
         $params['link_priority'] = JArrayHelper::getValue($params, 'link_priority', $parent->priority);
         $params['link_changefreq'] = JArrayHelper::getValue($params, 'link_changefreq', $parent->changefreq);
 
-        if ($params['link_priority'] == -1) {
+        if ($params['link_priority'] == -1)
+        {
             $params['link_priority'] = $parent->priority;
         }
 
-        if ($params['link_changefreq'] == -1) {
+        if ($params['link_changefreq'] == -1)
+        {
             $params['link_changefreq'] = $parent->changefreq;
         }
 
-        switch ($uri->getVar('view')) {
+        switch ($uri->getVar('view'))
+        {
             case 'categories':
                 self::getCategoryTree($xmap, $parent, $params, $uri->getVar('id'));
                 break;
@@ -73,7 +92,13 @@ class xmap_com_weblinks
         }
     }
 
-    private static function getCategoryTree(XmapDisplayer &$xmap, stdClass &$parent, array &$params, $parent_id)
+    /**
+     * @param XmapDisplayerInterface $xmap
+     * @param stdClass $parent
+     * @param array $params
+     * @param int $parent_id
+     */
+    private static function getCategoryTree($xmap, stdClass $parent, array &$params, $parent_id)
     {
         $db = JFactory::getDbo();
 
@@ -85,24 +110,28 @@ class xmap_com_weblinks
             ->where('c.published = 1')
             ->order('c.lft');
 
-        if (!$params['show_unauth']) {
+        if (!$params['show_unauth'])
+        {
             $query->where('c.access IN(' . $params['groups'] . ')');
         }
 
-        if ($params['language_filter']) {
+        if ($params['language_filter'])
+        {
             $query->where('c.language IN(' . $db->quote(JFactory::getLanguage()->getTag()) . ', ' . $db->quote('*') . ')');
         }
 
         $db->setQuery($query);
         $rows = $db->loadObjectList();
 
-        if (empty($rows)) {
+        if (empty($rows))
+        {
             return;
         }
 
         $xmap->changeLevel(1);
 
-        foreach ($rows as $row) {
+        foreach ($rows as $row)
+        {
             $node = new stdclass;
             $node->id = $parent->id;
             $node->name = $row->title;
@@ -113,7 +142,8 @@ class xmap_com_weblinks
             $node->pid = $row->parent_id;
             $node->link = WeblinksHelperRoute::getCategoryRoute($row->id);
 
-            if ($xmap->printNode($node) !== false) {
+            if ($xmap->printNode($node) !== false)
+            {
                 self::getlinks($xmap, $parent, $params, $row->id);
             }
         }
@@ -121,11 +151,18 @@ class xmap_com_weblinks
         $xmap->changeLevel(-1);
     }
 
-    private static function getlinks(XmapDisplayer &$xmap, stdClass &$parent, array &$params, $catid)
+    /**
+     * @param XmapDisplayerInterface $xmap
+     * @param stdClass $parent
+     * @param array $params
+     * @param int $catid
+     */
+    private static function getlinks($xmap, stdClass $parent, array &$params, $catid)
     {
         self::getCategoryTree($xmap, $parent, $params, $catid);
 
-        if (!$params['include_links']) {
+        if (!$params['include_links'])
+        {
             return;
         }
 
@@ -141,24 +178,28 @@ class xmap_com_weblinks
             ->where('(w.publish_down = ' . $db->quote($db->getNullDate()) . ' OR w.publish_down >= ' . $db->quote($now) . ')')
             ->order('w.ordering');
 
-        if (!$params['show_unauth']) {
+        if (!$params['show_unauth'])
+        {
             $query->where('w.access IN(' . $params['groups'] . ')');
         }
 
-        if ($params['language_filter']) {
+        if ($params['language_filter'])
+        {
             $query->where('w.language IN(' . $db->quote(JFactory::getLanguage()->getTag()) . ', ' . $db->quote('*') . ')');
         }
 
         $db->setQuery($query);
         $rows = $db->loadObjectList();
 
-        if (empty($rows)) {
+        if (empty($rows))
+        {
             return;
         }
 
         $xmap->changeLevel(1);
 
-        foreach ($rows as $row) {
+        foreach ($rows as $row)
+        {
             $node = new stdclass;
             $node->id = $parent->id;
             $node->name = $row->title;
